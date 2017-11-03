@@ -1,21 +1,32 @@
 
 # Author: TheFrenchLeaf https://github.com/TheFrenchLeaf
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6)
 
-PROJECT(CXSparse C)
+project(CXSparse C)
 
-INCLUDE_DIRECTORIES(./
+include_directories(./
 ./Include)
 
-FILE(GLOB CXSparse_SRCS "Source/*.c")
+file(GLOB CXSparse_SRCS "Source/*.c")
+set(CXSparse_HEADERS
+  Include/SuiteSparse_config.h
+  Include/cs.h
+  )
+
 set_source_files_properties(${CXSparse_SRCS} PROPERTIES LANGUAGE C)
 add_definitions(-DNCOMPLEX)
 
-ADD_LIBRARY(cxsparse STATIC ${CXSparse_SRCS})
+add_library(cxsparse STATIC ${CXSparse_SRCS})
 if(UNIX)
-  TARGET_LINK_LIBRARIES(cxsparse m)
-  SET_TARGET_PROPERTIES(cxsparse PROPERTIES COMPILE_FLAGS -fPIC)
-ENDIF(UNIX)
+  target_link_libraries(cxsparse m)
+  set_target_properties(cxsparse PROPERTIES COMPILE_FLAGS -fPIC)
+endiF(UNIX)
 
-ADD_SUBDIRECTORY(Demo)
+option(BUILD_DEMO "Enable Demo." OFF)
+if(BUILD_DEMO)
+  add_subdirectory(Demo)
+endif()
+
+install(TARGETS cxsparse DESTINATION lib)
+install(FILES ${CXSparse_HEADERS} DESTINATION include/suitesparse)
